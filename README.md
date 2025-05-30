@@ -1,24 +1,107 @@
-# README
+# Liveheats Tech Test
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## Description
 
-Things you may want to cover:
+This web-based system is designed to help teachers at a local school manage race day results for students. It allows teachers to set up races, assign students to lanes, record their finishing places, and view the results.
 
-* Ruby version
+## Features Implemented
 
-* System dependencies
+**Race Setup**:
+* Teachers can create new races.
+* Teachers can assign students to specific lanes for each race.
+* A race requires at least 2 students to be set up.
+* The app prevents assigning the same student to multiple lanes in the same race.
+* The app prevents assigning different students to the same lane in the same race.
+  
+**Result Recording**:
+* Teachers can enter the final finishing place for each student in a race.
+* The app validates that places are entered without gaps (e.g., 1, 2, 3 is valid; 1, 3 is not if only two participants).
+* The app correctly handles ties in placings (e.g., if two students tie for 1st, the next place is 3rd).
+  
+**Result Viewing**:
+* Teachers can view a list of all races and results.
 
-* Configuration
+## User Guide
 
-* Database creation
+1. Register students
+2. Set up a race. Assign students to lanes (1 student per lane, minimum 2 students)
+3. Record results. Enter the place of each student
+4. View results
 
-* Database initialization
+## Tech Stack
 
-* How to run the test suite
+* Ruby 3.2.4
+* Rails 7.1.5.1
+* Database: SQLite3
+* Testing Framework: Unit tests with Rspec
 
-* Services (job queues, cache servers, search engines, etc.)
+## Prerequisites
 
-* Deployment instructions
+Before you begin, ensure you have the following installed:
+* ruby 3.2.4
+* nodejs 20.15.0
+* yarn 1.22.10
+* Bundler (`gem install bundler`)
+* SQLite3
 
-* ...
+## Setup and Installation
+
+1.  **Clone the Repository:**
+
+    Clone the project repository to your local machine
+    ```
+    git clone git@github.com:lauren-lancaster/liveheats_test.git
+    ```
+3.  **Navigate to the Project Directory:**
+
+    Change into the newly cloned project directory:
+
+    ```
+    cd liveheats_test
+    ```
+5.  **Install Ruby Dependencies:**
+
+    This project uses Bundler to manage Ruby gems. Install the required gems by running:
+
+    ```
+    bundle install
+    ```
+7.  **Install JavaScript Dependencies:**
+
+    This project uses Yarn to manage JavaScript packages. Install them by running:
+
+    ```
+    yarn install
+    ```
+9.  **Database Setup (SQLite3):**
+
+    This application uses SQLite3
+
+    * **Create the database:** 
+        ```
+        rails db:create
+        ```
+
+    * **Run database migrations:** 
+        ```
+        rails db:migrate
+        ```
+11.  **Seed Initial Data:**
+    
+      ```
+      rails db:seed
+      ```
+
+## Running the Application
+
+To run the application:
+`bin/rails server`
+
+## Running the Tests
+
+To run the test suite:
+`bundle exec rspec`
+
+## DB Diagram
+
+<img width="921" alt="Screenshot 2025-05-30 at 2 33 46 PM" src="https://github.com/user-attachments/assets/2a5da9df-a3dd-40b0-80c0-cce519bb680c" />
