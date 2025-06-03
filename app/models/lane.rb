@@ -10,4 +10,5 @@ class Lane < ApplicationRecord
   # This validation does not create a uniqueness constraint in the database
   # so a scenario can occur whereby two different database connections create two records with the same value for a column that you intended to be unique.
   validates :student_id, uniqueness: { scope: :race_id, message: "can only be assigned to one lane per race" }
+  validates :lane_number, uniqueness: { scope: :race_id, message: "can only have one student" }
 end

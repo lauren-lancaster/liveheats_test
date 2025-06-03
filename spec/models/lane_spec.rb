@@ -2,7 +2,9 @@ require 'rails_helper'
 
 RSpec.describe Lane, type: :model do
   let!(:race) { Race.create!(name: "100m Sprint") }
+  let!(:race_2) { Race.create!(name: "300m race") }
   let!(:student) { Student.create!(name: "Rosa") }
+  let!(:student_2) { Student.create!(name: "George") }
 
   describe "new lane" do
     context "when creating a new lane with a student, race, lane number, and student place" do
@@ -117,12 +119,32 @@ RSpec.describe Lane, type: :model do
 
     context "when the same student is in different races" do
       it "is valid for both instances" do
-        race_2 = Race.create(name: "300m race")
         lane_1 = Lane.new(student: student, race: race, lane_number: 1)
         lane_2 = Lane.new(student: student, race: race_2, lane_number: 1)
 
         expect(lane_1.save).to be true
         expect(lane_2).to be_valid
+      end
+    end
+
+    context "when a lane number has multiple students in a given race" do
+      it "is invalid for the second instance of the lane number" do
+        lane = Lane.new(student: student, race: race, lane_number: 1)
+        lane_duplicate = Lane.new(student: student_2, race: race, lane_number: 1)
+
+        expect(lane.save).to be true
+        expect(lane_duplicate).to be_invalid
+        expect(lane_duplicate.errors[:lane_number]).to include("can only have one student")
+      end
+    end
+
+    context "when a lane number is in different races" do
+      it "is valid for both instances of the lane number" do
+        lane = Lane.new(student: student, race: race, lane_number: 1)
+        lane_duplicate = Lane.new(student: student, race: race_2, lane_number: 1)
+
+        expect(lane.save).to be true
+        expect(lane_duplicate).to be_valid
       end
     end
   end
