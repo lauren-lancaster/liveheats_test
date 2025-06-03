@@ -2,27 +2,49 @@ require 'rails_helper'
 
 RSpec.describe Race, type: :model do
   describe "creating a race" do
-    context "when creating a new race with a name" do
-      let(:new_race_with_name) { Race.new(name: "200m sprint") }
+    let!(:student) { Student.create!(name: "Noelle") }
+    let!(:student_2) { Student.create!(name: "Kris") }
 
-      it "is valid" do
-        expect(new_race_with_name).to be_valid
+    context "when transitioning the race status from setup" do
+      context "with multiple valid participants" do
+        let(:race_with_minimum_capicity_achieved) { Race.create!(name: "200m hurdles", status: "SETUP") }
+
+        before do
+          Lane.create!(race: race_with_minimum_capicity_achieved, student: student, lane_number: 1)
+          Lane.create!(race: race_with_minimum_capicity_achieved, student: student_2, lane_number: 2)
+          race_with_minimum_capicity_achieved.status = "CONFIRMED"
+        end
+
+        # TODO: could be done with factoryBot for cleaner code
+        it "creates a new race" do
+          expect { Race.create!(name: "200m hurdles", status: "SETUP") }.to change { Race.count }.by(1)
+        end
+
+        it "is valid" do
+          expect(race_with_minimum_capicity_achieved).to be_valid
+        end
       end
 
-      it "creates a new race" do
-        expect { new_race_with_name.save }.to change { Race.count }.by(1)
-      end
-    end
+      context "when a race has 1 student" do
+        let(:race_below_capacity) { Race.create!(name: "100m sprint", status: "SETUP") }
 
-    context "when registering a student without a name" do
-      let(:new_race_without_name) { Student.new(name: nil) }
+        before do
+          Lane.create!(race: race_below_capacity, student: student, lane_number: 1)
+          race_below_capacity.status = "CONFIRMED"
+        end
 
-      it "is not valid" do
-        expect(new_race_without_name).not_to be_valid
-      end
+        it "does not create a new race" do
+          expect { race_below_capacity }.not_to change { Race.count }
+        end
+                
+        it "is not valid when status is set to CONFIRMED" do
+          expect(race_below_capacity).not_to be_valid
+        end
 
-      it "does not create a new race" do
-        expect { new_race_without_name.save }.not_to change { Race.count }
+        it "adds a base error message" do
+          race_below_capacity.valid?
+          expect(race_below_capacity.errors[:base]).to include("must have at least 2 participants to be ready.")
+        end
       end
     end
   end
