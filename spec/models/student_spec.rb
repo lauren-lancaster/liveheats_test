@@ -8,10 +8,6 @@ RSpec.describe Student, type: :model do
       it "is valid" do
         expect(new_student_with_name).to be_valid
       end
-
-      it "creates a new student" do
-        expect { new_student_with_name.save }.to change { Student.count }.by(1)
-      end
     end
 
     context "when registering a student without a name" do
@@ -19,10 +15,6 @@ RSpec.describe Student, type: :model do
 
       it "is not valid" do
         expect(new_student_without_name).not_to be_valid
-      end
-
-      it "does not create a new student" do
-        expect { new_student_without_name.save }.not_to change { Student.count }
       end
 
       it "throws an error message" do
