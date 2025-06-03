@@ -4,7 +4,7 @@ RSpec.describe Lane, type: :model do
   let!(:race) { Race.create!(name: "100m Sprint") }
   let!(:student) { Student.create!(name: "Rosa") }
 
-  describe "lane" do
+  describe "new lane" do
     context "when creating a new lane with a student, race, lane number, and student place" do
       it "is valid" do
         lane = Lane.new(student: student, race: race, lane_number: 1, student_place: 3)
@@ -101,6 +101,28 @@ RSpec.describe Lane, type: :model do
         lane = Lane.new(student: student, race: race, lane_number: 1, student_place: "first")
 
         expect { lane.save }.not_to change { Lane.count }
+      end
+    end
+
+    context "when the student is not unique in a given race" do
+      it "is invalid for the second instance of the student" do
+        lane_1 = Lane.new(student: student, race: race, lane_number: 1)
+        lane_2 = Lane.new(student: student, race: race, lane_number: 2)
+
+        expect(lane_1.save).to be true
+        expect(lane_2).to be_invalid
+        expect(lane_2.errors[:student_id]).to include("can only be assigned to one lane per race")
+      end
+    end
+
+    context "when the same student is in different races" do
+      it "is valid for both instances" do
+        race_2 = Race.create(name: "300m race")
+        lane_1 = Lane.new(student: student, race: race, lane_number: 1)
+        lane_2 = Lane.new(student: student, race: race_2, lane_number: 1)
+
+        expect(lane_1.save).to be true
+        expect(lane_2).to be_valid
       end
     end
   end
