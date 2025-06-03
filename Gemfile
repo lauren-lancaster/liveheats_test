@@ -52,6 +52,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mswin mswin64 mingw x64_mingw ]
   
   gem "pry"
+  gem 'rails-controller-testing'
 end
 
 group :development do
