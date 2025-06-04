@@ -12,6 +12,16 @@ class Race < ApplicationRecord
 
   after_initialize :set_default_status, if: :new_record?
 
+  # Calculates the next available lane number for the current race
+  def next_available_lane_number
+    (self.lanes.maximum(:lane_number) || 0) + 1
+  end
+
+  def available_students_for_registration
+    participating_student_ids = self.lanes.pluck(:student_id)
+    Student.where.not(id: participating_student_ids).order(:name)
+  end
+
   private
 
   def set_default_status

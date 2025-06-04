@@ -1,4 +1,3 @@
-# spec/controllers/students_controller_spec.rb
 require 'rails_helper'
 
 RSpec.describe StudentsController, type: :controller do
