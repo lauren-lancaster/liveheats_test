@@ -55,6 +55,133 @@ RSpec.describe RacesController, type: :controller do
     end
   end
 
+  describe "GET #edit_results" do
+    let!(:student_1) { Student.create!(name: "Michelle") }
+    let!(:student_2) { Student.create!(name: "Orla") }
+    let!(:confirmed_race) do
+          race = Race.create!(name: "Confirmed Race", status: "SETUP")
+          Lane.create!(race: race, student: student_1, lane_number: 1)
+          Lane.create!(race: race, student: student_2, lane_number: 2)
+          race.update!(status: "CONFIRMED")
+
+          race
+    end
+
+    context "when race exists and has lanes" do
+      before { get :edit_results, params: { id: confirmed_race.id } }
+
+      it "renders the edit_results template" do
+        expect(response).to render_template(:edit_results)
+      end
+    end
+
+    context "when race exists and has no lanes" do
+      let!(:race_no_lanes) { Race.create!(name: "400m Swim", status: "SETUP") }
+
+      before { get :edit_results, params: { id: race_no_lanes.id } }
+
+      it "redirects to the race show page" do
+        expect(response).to redirect_to(race_path(race_no_lanes))
+      end
+
+      it "sets an alert flash message" do
+        expect(flash[:alert]).to eq("This race has no participants assigned to lanes yet.")
+      end
+    end
+
+    context "when race does not exist" do
+      it "redirects to the races index page" do
+        # TODO: redirect to index path
+      end
+
+      it "sets a flash alert message" do
+        # expect(flash[:alert]).to eq("Race not found.")
+      end
+    end
+  end
+
+  describe "PATCH #update_results" do
+    let!(:student_1) { Student.create!(name: "Michelle") }
+    let!(:student_2) { Student.create!(name: "Orla") }
+    let!(:race_for_update) do
+          race = Race.create!(name: "Confirmed Race", status: "SETUP")
+          Lane.create!(race: race, student: student_1, lane_number: 1)
+          Lane.create!(race: race, student: student_2, lane_number: 2)
+          race.update!(status: "CONFIRMED")
+
+          race
+    end
+    let(:lane_1) { race_for_update.lanes.find_by(lane_number: 1) }
+    let(:lane_2) { race_for_update.lanes.find_by(lane_number: 2) }
+
+    context "with valid parameters" do
+      let(:valid_params) do
+        {
+          id: race_for_update.id,
+          race: {
+            lanes_attributes: {
+              "0" => { id: lane_1.id, student_place: "1" },
+              "1" => { id: lane_2.id, student_place: "2" }
+            }
+          }
+        }
+      end
+
+      it "updates the student_place for the lanes" do
+        patch :update_results, params: valid_params
+        expect(lane_1.reload.student_place).to eq(1)
+        expect(lane_2.reload.student_place).to eq(2)
+      end
+
+      it "redirects to the race show page" do
+        patch :update_results, params: valid_params
+        expect(response).to redirect_to(race_path(race_for_update))
+      end
+
+      it "sets a success notice flash message" do
+        patch :update_results, params: valid_params
+        expect(flash[:notice]).to eq('Race results were successfully updated.')
+      end
+
+      it "updates the race status to COMPLETE" do
+        patch :update_results, params: valid_params
+        race_for_update.reload
+        
+        expect(race_for_update.status).to eq("COMPLETE")
+      end
+    end
+
+    context "with invalid parameters" do
+      let(:invalid_params_gap) do
+        {
+          id: race_for_update.id,
+          race: {
+            lanes_attributes: {
+              "0" => { id: lane_1.id, student_place: "1" },
+              "1" => { id: lane_2.id, student_place: "3" }
+            }
+          }
+        }
+      end
+
+      before { patch :update_results, params: invalid_params_gap }
+
+      it "does not update the student_place for the lanes" do
+        expect(lane_1.reload.student_place).to be_nil
+        expect(lane_2.reload.student_place).to be_nil
+      end
+
+      it "re-renders the edit_results template with unprocessable_entity status" do
+        expect(response).to render_template(:edit_results)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it "sets an alert flash message" do
+        expect(flash.now[:alert]).to eq("Failed to update results.")
+      end
+    end
+  end
+
   describe "GET #show" do
     let!(:student_1) { Student.create!(name: "Bert") }
     let!(:student_2) { Student.create!(name: "Ernie") }

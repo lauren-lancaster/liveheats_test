@@ -1,8 +1,9 @@
 class RacesController < ApplicationController
-  before_action :set_race, only: [:show, :add_student_to_lane, :confirm]
+  before_action :set_race, only: [:edit_results, :update_results, :show, :add_student_to_lane, :confirm]
 
   def index
   end
+  
   def new
     @race = Race.new
   end
@@ -14,6 +15,26 @@ class RacesController < ApplicationController
       redirect_to @race, notice: "'#{saved_race_name}' was successfully created. You can now assign registered students to lanes."
     else
       render :new, status: :unprocessable_entity
+    end
+  end
+
+  def edit_results
+    @lanes = @race.lanes.includes(:student).order(:lane_number)
+    if @lanes.empty?
+      redirect_to @race, alert: "This race has no participants assigned to lanes yet."
+      
+      return
+    end
+  end
+
+  def update_results
+    if @race.update(race_params_for_results)
+      @race.update(status: "COMPLETE") # Could also be done as a model method
+      redirect_to race_path(@race), notice: 'Race results were successfully updated.'
+    else
+      @lanes = @race.lanes.includes(:student).order(:lane_number)
+      flash.now[:alert] = "Failed to update results."
+      render :edit_results, status: :unprocessable_entity
     end
   end
 
@@ -76,7 +97,13 @@ class RacesController < ApplicationController
   end
 
   def race_params
-    params.require(:race).permit(:name)
+    params.require(:race).permit(:name, :status)
+  end
+
+  def race_params_for_results
+    params.require(:race).permit(
+      lanes_attributes: [:id, :student_place]
+    )
   end
 end
 

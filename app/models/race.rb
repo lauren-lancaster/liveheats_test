@@ -2,6 +2,8 @@ class Race < ApplicationRecord
   has_many :lanes, dependent: :destroy # lanes are deleted if the race is deleted
   has_many :students, through: :lanes
 
+  accepts_nested_attributes_for :lanes
+
   # TODO: move to a constants file
   MINIMUM_CAPACITY = 2
   RACE_STATUS = ["SETUP", "CONFIRMED", "COMPLETE"].freeze # more states can be added such as cancelled

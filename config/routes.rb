@@ -10,6 +10,8 @@ Rails.application.routes.draw do
     member do
       post :add_student_to_lane
       patch :confirm
+      get 'record_results', to: 'races#edit_results'
+      patch 'record_results', to: 'races#update_results'
     end
   end
 end
