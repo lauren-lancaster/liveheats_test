@@ -1,0 +1,19 @@
+<%= form_with(model: form_object, url: url_for_form, method: :post, local: true) do |form| %>
+  <div>
+    <p>
+      <strong>Assigning to Lane: <%= @next_lane_number %></strong>
+    </p>
+    <%= form.hidden_field :lane_number, value: @next_lane_number %>
+  </div>
+
+  <div>
+    <%= form.label :student_id, "Select Student:" %><br>
+    <%= form.collection_select :student_id, @available_students, :id, :name,
+        { prompt: "Select a student" },
+        { required: true } %>
+  </div>
+
+  <div>
+    <%= form.submit "Register Student to Lane" %>
+  </div>
+<% end %>
