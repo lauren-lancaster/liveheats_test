@@ -106,6 +106,21 @@ RSpec.describe Lane, type: :model do
       end
     end
 
+    context "when creating a new lane and student_place is present but below 1" do
+      it "is invalid" do
+        lane = Lane.new(student: student, race: race, lane_number: 1, student_place: 0)
+
+        expect(lane).not_to be_valid
+        expect(lane.errors[:student_place]).to include("must be greater than 0")
+      end
+
+      it "does not create a new lane" do
+        lane = Lane.new(student: student, race: race, lane_number: 1, student_place: 0)
+
+        expect { lane.save }.not_to change { Lane.count }
+      end
+    end
+
     context "when the student is not unique in a given race" do
       it "is invalid for the second instance of the student" do
         lane_1 = Lane.new(student: student, race: race, lane_number: 1)
@@ -146,6 +161,24 @@ RSpec.describe Lane, type: :model do
         expect(lane.save).to be true
         expect(lane_duplicate).to be_valid
       end
+    end
+  end
+
+  describe "update lane with place attribute" do
+    let!(:race_confirmed) do
+      race = Race.create!(name: "Triathlon", status: "SETUP")
+      Lane.create!(race: race, student: student, lane_number: 1)
+      Lane.create!(race: race, student: student_2, lane_number: 2)
+      race.update!(status: "CONFIRMED")
+      race
+    end
+
+    it "can record a valid numerical place" do
+      success = race_confirmed.lanes[0].update(student_place: 1)
+      
+      expect(success).to be true
+      race_confirmed.reload 
+      expect(race_confirmed.lanes[0].student_place).to eq(1)
     end
   end
 end
