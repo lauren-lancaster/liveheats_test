@@ -1,0 +1,40 @@
+<%# app/views/races/edit_results.html.erb %>
+
+<h1>Record Results for <%= @race.name %></h1>
+
+<%= form_with(model: @race, url: record_results_race_path(@race), method: :patch, local: true) do |form| %>
+  <table>
+    <thead>
+      <tr>
+        <th>Lane Number</th>
+        <th>Student Name</th>
+        <th>Place</th>
+        <th>Errors</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= form.fields_for :lanes, @lanes do |lane_fields| %>
+        <tr>
+          <td><%= lane_fields.object.student.name %></td>
+          <td><%= lane_fields.object.lane_number %></td>
+          <td>
+            <%= lane_fields.hidden_field :id %>
+            <%= lane_fields.number_field :student_place, min: 1, class: 'form-control' %>
+          </td>
+          <td>
+            <% if lane_fields.object.errors[:student_place].any? %>
+              <span><%= lane_fields.object.errors[:student_place].join(", ") %></span>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <br>
+
+  <div>
+    <%= form.submit "Submit Results", class: 'btn btn-primary' %>
+    <%= link_to 'Cancel', race_path(@race), class: 'btn btn-secondary' %>
+  </div>
+<% end %>

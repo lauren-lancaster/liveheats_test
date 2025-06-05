@@ -56,11 +56,64 @@ RSpec.describe "Race System", type: :system do
     end
   end
 
+  describe "Accessing and Viewing the 'Record Results' Page" do
+    let!(:race_confirmed) do
+      race = Race.create!(name: "Triathlon", status: "SETUP")
+      Lane.create!(race: race, student: student_1, lane_number: 1)
+      Lane.create!(race: race, student: student_2, lane_number: 2)
+      race.update!(status: "CONFIRMED")
+      race
+    end
+
+    let!(:student_1) { Student.create!(name: "Jane") }
+    let!(:student_2) { Student.create!(name: "Lizzy") }
+
+    context "for a race that is CONFIRMED and has participants" do
+      before { visit record_results_race_path(race_confirmed) }
+
+      it "displays the race name in the heading" do
+        expect(page).to have_selector("h1", text: "Record Results for #{race_confirmed.name}")
+      end
+
+      it "lists each registered student with their lane number and a place input field" do
+        race_confirmed.lanes.includes(:student).order(:lane_number).each_with_index do |lane, index|
+          within("table tbody tr:nth-child(#{index + 1})") do
+            expect(page).to have_content(lane.student.name)
+            expect(page).to have_content(lane.lane_number.to_s)
+            expect(page).to have_field("race[lanes_attributes][#{index}][student_place]")
+          end
+        end
+      end
+
+      it "shows a 'Submit Results' button" do
+        expect(page).to have_button("Submit Results")
+      end
+
+      it "shows a 'Cancel' link that navigates back to the race show page" do
+        expect(page).to have_link("Cancel", href: race_path(race_confirmed))
+      end
+    end
+
+    context "for a race that has no participants assigned" do
+      before do
+        @empty_confirmed_race = Race.create!(name: "Vacant Race", status: "SETUP")
+        @empty_confirmed_race.update_columns(status: "CONFIRMED")
+        
+        visit record_results_race_path(@empty_confirmed_race)
+      end
+
+      it "redirects to the race show page and displays an alert" do
+        expect(page).to have_current_path(race_path(@empty_confirmed_race))
+        expect(page).to have_content("This race has no participants assigned to lanes yet.")
+      end
+    end
+  end
+
   describe "Viewing and Managing a Race (Show Page)" do
     let!(:race_in_setup) { Race.create!(name: "200m Swim", status: "SETUP") }
     
     let!(:race_confirmed) do
-      race = Race.create!(name: "Triathalon", status: "SETUP")
+      race = Race.create!(name: "Triathlon", status: "SETUP")
       Lane.create!(race: race, student: student_1, lane_number: 1)
       Lane.create!(race: race, student: student_2, lane_number: 2)
       race.update!(status: "CONFIRMED")
@@ -222,7 +275,7 @@ RSpec.describe "Race System", type: :system do
 
     context "when race status is not SETUP" do
       let!(:lane_for_student_1) { Lane.create!(race: race_in_setup, student: student_1, lane_number: 1) }
-      
+
       before { visit race_path(race_confirmed) }
 
       it "displays 'Student registration is closed.'" do

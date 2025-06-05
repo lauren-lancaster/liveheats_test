@@ -1,6 +1,5 @@
 <div>
   <h1>Race Details: <%= @race.name %></h1>
-  <%# TODO: check flash alert covered by app view %>
 
   <h2>Registered Students & Lanes</h2>
   <% if @lane_assignments.any? %>
@@ -47,6 +46,9 @@
     </div>
   <% else %>
     <p>Student registration is closed.</p>
+    <% if @race.status == "CONFIRMED" %>
+      <%= link_to 'Record Results', record_results_race_path(@race) %>
+    <% end %>
   <% end %>
 
   <% if @race.status == "SETUP" %>
