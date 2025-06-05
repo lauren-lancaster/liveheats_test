@@ -8,6 +8,19 @@ RSpec.describe RacesController, type: :controller do
     { name: "" }
   end
 
+  describe "GET #index" do
+    it "responds successfully" do
+      get :index
+      expect(response).to render_template(:index)
+      expect(response).to be_successful
+    end
+
+    it "renders the template" do
+      get :index
+      expect(response).to render_template(:index)
+    end
+  end
+
   describe "GET #new" do
     it "renders the new template" do
       get :new
@@ -146,7 +159,7 @@ RSpec.describe RacesController, type: :controller do
       it "updates the race status to COMPLETE" do
         patch :update_results, params: valid_params
         race_for_update.reload
-        
+
         expect(race_for_update.status).to eq("COMPLETE")
       end
     end

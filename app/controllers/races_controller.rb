@@ -2,6 +2,7 @@ class RacesController < ApplicationController
   before_action :set_race, only: [:edit_results, :update_results, :show, :add_student_to_lane, :confirm]
 
   def index
+    @races = Race.includes(:lanes).order(name: :asc)
   end
   
   def new
