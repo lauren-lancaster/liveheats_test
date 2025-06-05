@@ -6,6 +6,20 @@ This web-based system is designed to help teachers at a local school manage race
 
 I have made a conscious choice not to include tests in my SETUP, README, and Migration commits. The rest of this app is TDD
 
+## Considerations/Improvements for future work
+
+* I would rename my Lanes table. I don't think 'Lanes' accurately reflects what it represents. A possible name change would be 'Race Participant'
+* I would use helper methods and/or FactoryBots in my specs for cleanliness and to reduce repeated code
+* My state changes for 'Race' would be handled through methods - perhaps in the Race model
+* I would enable turbo rails and use it for me front end. I disabled it for my own ease and time constraints but would prefer to implement it in the app
+* Currently the app has no styling. I would create custom CSS to style the app
+* I started writing Request specs, but didn't follow through for the whole project. The functionality I was testing was covered by the controller. However it seems better practice to handle integration tests in Request
+* I ran out of time to do anything with the 'Errors' column in my Record Results table. I don't like the flow of having an errors column here. I would like to implement clearer error handling elsewhere on the page. My preferred style would be to have errors listed at the top for each student name in the case that a teacher incorrectly assigns places (eg. 1, 1, 4 or 1, 2, 4)
+* All forms would consistently be split out into partials
+* I have listed a handful of # TODOs in the comments of my code that I would fix given more time
+* A consideration I had was that I could move my lane assignment logic to a lane controller instead of the races controller. Pros of this would be that there would be clear separation of concerns, and would also allow for scalability of Lanes management if I was to implement editing and deleting of data in future. However I decided to keep the logic in the races controller because from a user experience point of view it makes more sense contextually, and given the brief of the test it maintained a simpler workflow
+* Another considersation is my model validations. I believe there may be a concurrency issue with my validations. For example if the same race has the same student assigned to it at once by different users, the student may be assigned twice. I also think if the same race results were recorded at the same time my place logic validations may be overridden. I have yet to test this
+
 ## Features Implemented
 
 **Race Setup**:
@@ -95,6 +109,8 @@ Before you begin, ensure you have the following installed:
 
 To run the application:
 `bin/rails server`
+
+URL: http://localhost:3000/
 
 ## Running the Tests
 
