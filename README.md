@@ -28,6 +28,8 @@ This web-based system is designed to help teachers at a local school manage race
 3. Record results. Enter the place of each student
 4. View results
 
+5. Any stage of the race creation process can be accessed from 'Manage Races'. From there students can be assigned to a race, results can be recorded, or a completed race can be viewed
+
 ## Tech Stack
 
 * Ruby 3.2.4
@@ -86,11 +88,6 @@ Before you begin, ensure you have the following installed:
         ```
         rails db:migrate
         ```
-11.  **Seed Initial Data:**
-    
-      ```
-      rails db:seed
-      ```
 
 ## Running the Application
 
@@ -104,4 +101,5 @@ To run the test suite:
 
 ## DB Diagram
 
-<img width="921" alt="Screenshot 2025-05-30 at 2 33 46 PM" src="https://github.com/user-attachments/assets/2a5da9df-a3dd-40b0-80c0-cce519bb680c" />
+<img width="995" alt="Screenshot 2025-06-05 at 2 30 38 PM" src="https://github.com/user-attachments/assets/30fb6b01-84e7-4787-af7b-2fb6d5be9f6e" />
+
