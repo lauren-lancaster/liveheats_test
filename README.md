@@ -4,6 +4,8 @@
 
 This web-based system is designed to help teachers at a local school manage race day results for students. It allows teachers to set up races, assign students to lanes, record their finishing places, and view the results.
 
+I have made a conscious choice not to include tests in my SETUP, README, and Migration commits. The rest of this app is TDD
+
 ## Features Implemented
 
 **Race Setup**:
