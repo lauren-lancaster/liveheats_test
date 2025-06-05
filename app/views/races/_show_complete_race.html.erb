@@ -1,0 +1,15 @@
+  <% if @race.status == "COMPLETE"%>
+    <h2>Race Results</h2>
+    <% results = @race.lanes.includes(:student).where.not(student_place: nil).order(student_place: :asc, 'students.name': :asc) %>
+    <% if results.any? %>
+      <ul>
+        <% results.each do |lane| %>
+            <p><strong><%= lane.student_place %>:</strong> 
+            <%= lane.student.name %> 
+            (Lane: <%= lane.lane_number %>)</p>
+        <% end %>
+      </ul>
+    <% else %>
+    <p>Although this race is marked as complete, no specific places have been recorded for the participants.</p>
+    <% end %>
+  <% end%>

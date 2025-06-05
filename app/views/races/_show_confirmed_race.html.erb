@@ -1,0 +1,13 @@
+  <% if @race.status == "CONFIRMED"%>
+    <h2>Registered Students & Lanes</h2>
+    <% if @lane_assignments.any? %>
+      <ul>
+        <% @lane_assignments.each do |lane| %>
+          <li>
+            <strong>Lane <%= lane.lane_number %>:</strong> <%= lane.student.name %>
+          </li>
+        <%end%>
+      </ul>
+    <% end %>
+    <%= link_to 'Record Results', record_results_race_path(@race) %>
+  <% end%>

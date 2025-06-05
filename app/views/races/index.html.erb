@@ -1,0 +1,12 @@
+<%# app/views/races/index.html.erb %>
+
+<h1>Races</h1>
+
+<%= render 'race_table', race: @race %>
+
+<p>
+  <%= link_to 'Create New Race', new_race_path %>
+</p>
+<p>
+  <%= link_to 'Back to Home', root_path %>
+</p>

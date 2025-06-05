@@ -133,14 +133,6 @@ RSpec.describe "Race System", type: :system do
       it "shows a link to 'Back home'" do
         expect(page).to have_link("Back home", href: root_path)
       end
-
-      it "shows a link to 'Manage Students'" do
-        expect(page).to have_link("Manage Students", href: new_student_path)
-      end
-
-      it "shows a link to 'Create Race'" do
-        expect(page).to have_link("Create Race", href: new_race_path)
-      end
     end
 
     context "when race status is 'SETUP'" do
@@ -256,7 +248,6 @@ RSpec.describe "Race System", type: :system do
           expect(race_in_setup.status).to eq("CONFIRMED")
           expect(page).not_to have_content("Register Student for Next Lane")
           expect(page).not_to have_button("Confirm Race")
-          expect(page).to have_content("Student registration is closed.")
         end
 
         it "prevents confirming if minimum capacity is not met (controller should handle)" do
@@ -278,10 +269,6 @@ RSpec.describe "Race System", type: :system do
 
       before { visit race_path(race_confirmed) }
 
-      it "displays 'Student registration is closed.'" do
-        expect(page).to have_content("Student registration is closed.")
-      end
-
       it "does not display the 'Register Student for Next Lane' form" do
         expect(page).not_to have_content("Register Student for Next Lane")
         expect(page).not_to have_button("Register Student to Lane")
@@ -295,6 +282,39 @@ RSpec.describe "Race System", type: :system do
       it "still lists registered students" do
         expect(page).to have_content("Registered Students & Lanes")
         expect(page).to have_content("Lane #{lane_for_student_1.lane_number}: #{student_1.name}")
+      end
+    end
+
+    describe "viewing a race's results when race is COMPLETE" do
+      let!(:race_completed) do
+        race = Race.create!(name: "Triathlon", status: "COMPLETE")
+        Lane.create!(race: race, student: student_1, lane_number: 1, student_place: 1)
+        Lane.create!(race: race, student: student_2, lane_number: 2, student_place: 2)
+        race
+      end
+
+      let!(:student_1) { Student.create!(name: "Jane") }
+      let!(:student_2) { Student.create!(name: "Lizzy") }
+
+      context "basic display and navigation links" do
+        before { visit race_path(race_completed) }
+
+        it "displays the race name in the heading" do
+          expect(page).to have_selector("h1", text: "Race Details: #{race_completed.name}")
+        end
+
+        it "displays the results" do
+          expect(page).to have_content("1: #{student_1.name} (Lane: 1)")
+          expect(page).to have_content("2: #{student_2.name} (Lane: 2)")
+        end
+
+        it "displays the home button" do
+          expect(page).to have_link("Back home", href: root_path)
+        end
+
+        it "does not have SETUP section" do
+          expect(page).not_to have_content("Registered Students & Lanes")
+        end
       end
     end
   end

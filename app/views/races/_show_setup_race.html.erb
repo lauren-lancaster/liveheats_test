@@ -1,0 +1,49 @@
+  <% if @race.status == "SETUP" %>
+    <h2>Registered Students & Lanes</h2>
+    <% if @lane_assignments.any? %>
+      <ul>
+        <% @lane_assignments.each do |lane| %>
+          <li>
+            <strong>Lane <%= lane.lane_number %>:</strong> <%= lane.student.name %>
+          </li>
+        <% end %>
+      </ul>
+
+      <% if @lane_assignments.count < Race::MINIMUM_CAPACITY %>
+          <p>
+            <strong>Note:</strong> This race needs at least <%= Race::MINIMUM_CAPACITY %> participants to be confirmed.
+            Currently: <%= pluralize(@lane_assignments.count, "participant") %>.
+          </p>
+      <% end %>
+    <% else %>
+      <p>No students have been registered for this race yet.</p>
+    <% end %>
+
+    <div>
+      <h3>Register Student for Next Lane</h3>
+      <% if @next_lane_number && @available_students && @new_lane_assignment %>
+        <% if @available_students.any? %>
+          <%= render 'assign_student_to_lane',
+                    form_object: @new_lane_assignment,
+                    url_for_form: add_student_to_lane_race_path(@race),
+                    current_next_lane_number: @next_lane_number,
+                    available_students_list: @available_students %>
+        <% else %>
+          <p>
+            <% if Student.any? %>
+              All available students have been registered for this race
+            <% else %>
+              There are no students in the system. Please <%= link_to 'add students', new_student_path, style: "color: #007bff;" %> first.
+            <% end %>
+          </p>
+        <% end %>
+      <% else %>
+        <p>Student registration form cannot be displayed at this moment (missing data).</p>
+      <% end %>
+    </div>
+    <div>
+      <h4>Confirm Race</h4>
+      <p>Race must have minimum 2 students</p>
+      <%= button_to "Confirm Race", confirm_race_path(@race), method: :patch %>
+    </div>
+  <% end %>
